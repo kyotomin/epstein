@@ -1,9 +1,12 @@
 package cmd
 
 import (
-	"fmt"
+	"os"
+	"time"
 
 	"github.com/kyotomin/epstein/internal/prompt"
+	"github.com/kyotomin/epstein/internal/service"
+	"github.com/kyotomin/epstein/internal/ui"
 	"github.com/spf13/cobra"
 )
 
@@ -17,8 +20,23 @@ var decryptCmd = &cobra.Command{
 			return err
 		}
 
-		fmt.Println("Decrypt:", args[0])
-		fmt.Println("Password:", password)
+		start := time.Now()
+
+		if err := service.DecryptFile(args[0], password); err != nil {
+			return err
+		}
+
+		info, err := os.Stat(args[0])
+		if err != nil {
+			return err
+		}
+
+		ui.DecryptReport(
+			args[0],
+			time.Since(start),
+			info.Size(),
+		)
+
 		return nil
 	},
 }

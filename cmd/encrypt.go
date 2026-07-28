@@ -5,11 +5,12 @@ import (
 	"time"
 
 	"github.com/kyotomin/epstein/internal/prompt"
+	"github.com/kyotomin/epstein/internal/service"
 	"github.com/kyotomin/epstein/internal/ui"
 	"github.com/spf13/cobra"
 )
 
-var ecnryptCmd = &cobra.Command{
+var encryptCmd = &cobra.Command{
 	Use:   "encrypt <file>",
 	Short: "Encrypt file",
 	Args:  cobra.ExactArgs(1),
@@ -19,14 +20,16 @@ var ecnryptCmd = &cobra.Command{
 			return err
 		}
 
-		// report init
 		start := time.Now()
 		input := args[0]
+		if err := service.EncryptFile(input, password); err != nil {
+			return err
+		}
+
 		info, err := os.Stat(input)
 		if err != nil {
 			return err
 		}
-		// report init
 
 		ui.EncryptReport(
 			input,
@@ -35,12 +38,10 @@ var ecnryptCmd = &cobra.Command{
 			time.Since(start),
 		)
 
-		_ = password
-
 		return nil
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(ecnryptCmd)
+	rootCmd.AddCommand(encryptCmd)
 }
